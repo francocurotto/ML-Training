@@ -8,22 +8,23 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 rooms_ix, bedrooms_ix, population_ix, households_ix = 3, 4, 5, 6
 
-def preprocess_data(housing):
+def create_pipeline(housing):
     housing_num = housing.drop("ocean_proximity", axis=1)
 
     num_pipeline = Pipeline([
         ('imputer', SimpleImputer(strategy="median")),
         ('attribs_adder', CombinedAttributesAdder()),
-        ('std_scaler', StandardScaler())])
+        ('std_scaler', StandardScaler())
+    ])
 
     num_attribs = list(housing_num)
     cat_attribs = ["ocean_proximity"] 
     full_pipeline = ColumnTransformer([
         ("num", num_pipeline, num_attribs),
-        ("cat", OneHotEncoder(), cat_attribs)])
+        ("cat", OneHotEncoder(), cat_attribs)
+    ])
 
-    housing_prepared = full_pipeline.fit_transform(housing)
-    return housing_prepared
+    return full_pipeline
 
 class CombinedAttributesAdder(BaseEstimator, TransformerMixin):
     def __init__(self, add_bedrooms_per_room = True): # no *args or **kargs
